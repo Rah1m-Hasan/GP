@@ -1,9 +1,50 @@
 "use client";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, BarChart3, BookOpen, BriefcaseBusiness, CheckCircle2, FileSearch, GraduationCap, ShieldCheck, Sparkles, UserRound, X } from "lucide-react";
+
+import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
-const seeker=[['AI Career Profile',UserRound],['Skill Gap Analysis',FileSearch],['Job Matching',BriefcaseBusiness],['Personalized Learning',BookOpen],['Skill Verification',ShieldCheck],['AI Mock Interviews',GraduationCap]];
-const recruiter=['AI Candidate Screening','Verified Skill Profiles','Job-Specific Assessments','Interview Intelligence','Candidate Comparison','Recruitment Pipeline'];
-export default function Home(){const [modal,setModal]=useState(false); return <><header className="sticky top-0 z-30 border-b border-line bg-[#fbfcfb]/95 backdrop-blur"><div className="shell flex h-16 items-center justify-between"><Link href="/" className="flex items-center gap-2 font-bold"><span className="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">S</span>Skillbridge <em className="not-italic text-brand">AI</em></Link><nav className="hidden items-center gap-5 text-sm font-semibold text-[#63716e] lg:flex"><a href="#seekers">For Job Seekers</a><a href="#recruiters">For Recruiters</a><a href="#how">How It Works</a><a href="#features">Features</a><a href="#about">About</a></nav><div className="flex items-center gap-3"><Link href="/auth" className="hidden text-sm font-bold sm:block">Sign In</Link><button className="btn btn-primary text-sm" onClick={()=>setModal(true)}>Get Started<ArrowRight size={15}/></button></div></div></header><main><section className="shell grid gap-12 py-16 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:py-24"><div><p className="eyebrow">Your career, made actionable</p><h1 className="mt-4 max-w-2xl text-5xl font-extrabold leading-[1.08] sm:text-6xl">Don&apos;t Just Find Jobs.<br/><span className="text-brand">Become Ready</span> For Them.</h1><p className="mt-6 max-w-xl text-lg leading-8 muted">Skillbridge AI analyzes your skills, shows exactly what you&apos;re missing, creates a personalized learning path, verifies your progress, and connects you with roles you&apos;re ready for.</p><div className="mt-8 flex flex-wrap gap-3"><button onClick={()=>setModal(true)} className="btn btn-primary">Build My Career Profile <ArrowRight size={17}/></button><Link href="/dashboard/jobs" className="btn btn-secondary">Explore Jobs</Link></div><div className="mt-10 flex items-center gap-5 text-sm muted"><span className="flex items-center gap-2"><CheckCircle2 size={16} className="text-brand"/>Evidence-led progress</span><span className="flex items-center gap-2"><CheckCircle2 size={16} className="text-brand"/>No blind applications</span></div></div><motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} transition={{duration:.6}} className="card overflow-hidden p-2 shadow-lift"><div className="rounded-xl bg-[#f3f8f7] p-5 sm:p-7"><div className="flex justify-between"><div><p className="text-sm font-bold">Career Readiness</p><p className="mt-1 text-sm muted">Backend Developer</p></div><div className="grid h-16 w-16 place-items-center rounded-full border-[7px] border-brand text-lg font-bold">68%</div></div><div className="mt-7 space-y-4">{[['Python',80],['SQL',55],['FastAPI',45],['Docker',30]].map(([s,v])=><div key={String(s)}><div className="mb-1 flex justify-between text-sm"><span>{s}</span><b>{v}%</b></div><div className="progress"><span style={{width:`${v}%`}}/></div></div>)}</div><div className="mt-7 rounded-xl border border-[#cde5dc] bg-white p-4"><p className="text-xs font-bold text-brand">POTENTIAL AFTER ROADMAP</p><div className="mt-1 flex items-end justify-between"><b className="text-3xl">87%</b><span className="text-sm text-brand">+19 points</span></div></div></div></motion.div></section><section className="border-y border-line bg-white py-16"><div className="shell text-center"><p className="eyebrow">The problem</p><h2 className="mx-auto mt-3 max-w-3xl text-3xl font-bold">Job platforms show opportunities. Learning platforms show courses. Neither tells you what stands between you and the job you want.</h2><div className="mt-10 grid gap-4 md:grid-cols-3">{[['Unknown Skill Gaps','You know where you want to go, but not the precise skills holding you back.'],['Generic Learning','Broad courses consume time without moving your career forward.'],['Unclear Job Readiness','Applications disappear into the void, with no useful feedback.']].map(([a,b])=><article key={a} className="card p-6 text-left"><BarChart3 className="text-brand"/><h3 className="mt-5 text-lg font-bold">{a}</h3><p className="mt-2 text-sm leading-6 muted">{b}</p></article>)}</div></div></section><section id="features" className="shell py-20"><div className="max-w-xl"><p className="eyebrow">The Skillbridge loop</p><h2 className="mt-3 text-3xl font-bold">A clear system for career momentum.</h2></div><div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{['Assess','Identify Gaps','Learn','Practice','Prove Skills','Apply','Interview','Grow'].map((item,i)=><div className="card flex items-center gap-3 p-4" key={item}><span className="grid h-8 w-8 place-items-center rounded-full bg-mint text-sm font-bold text-brand">{i+1}</span><b className="text-sm">{item}</b></div>)}</div></section><section id="seekers" className="bg-[#183735] py-20 text-white"><div className="shell"><p className="eyebrow text-[#9ad8ca]">For job seekers</p><div className="mt-3 flex flex-wrap items-end justify-between gap-6"><h2 className="max-w-2xl text-3xl font-bold">Everything you need to turn skill gaps into proof.</h2><Link href="/onboarding" className="btn bg-white text-[#183735]">Start your profile <ArrowRight size={16}/></Link></div><div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{seeker.map(([title,Icon])=>{const I=Icon as typeof Sparkles;return <article key={title as string} className="rounded-2xl border border-white/15 bg-white/5 p-5"><I className="text-[#9ad8ca]"/><h3 className="mt-4 font-bold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-white/65">Guidance that connects your evidence, growth, and the opportunities ahead.</p></article>})}</div></div></section><section id="recruiters" className="shell py-20"><p className="eyebrow">For recruiters</p><h2 className="mt-3 max-w-2xl text-3xl font-bold">Hire on demonstrated capability, not keyword guesswork.</h2><div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{recruiter.map(x=><div key={x} className="card p-5"><Sparkles size={20} className="text-brand"/><b className="mt-4 block">{x}</b><p className="mt-2 text-sm muted">A more confident view of readiness and potential.</p></div>)}</div><Link href="/recruiter/coming-soon" className="mt-7 inline-flex items-center gap-2 font-bold text-brand">Explore the upcoming workspace <ArrowRight size={16}/></Link></section><section id="how" className="border-y border-line bg-white py-20"><div className="shell"><p className="eyebrow">How it works</p><h2 className="mt-3 text-3xl font-bold">Start with where you are. Move toward where you want to be.</h2><div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">{['Create your career profile','Upload a resume or choose a target role','Discover matching jobs and skill gaps','Close gaps and apply with stronger evidence'].map((x,i)=><div key={x} className="relative border-l-2 border-brand pl-5"><span className="text-xs font-bold text-brand">STEP {i+1}</span><h3 className="mt-2 font-bold">{x}</h3></div>)}</div></div></section><section className="shell py-20"><div className="rounded-3xl bg-brand px-7 py-14 text-center text-white sm:px-14"><p className="text-sm font-bold text-[#bde6dc]">THE NEXT STEP IS CLEAR</p><h2 className="mx-auto mt-3 max-w-2xl text-4xl font-bold">Turn every skill gap into a path forward.</h2><button onClick={()=>setModal(true)} className="btn mt-7 bg-white text-brand">Start Building Your Career <ArrowRight size={16}/></button></div></section></main><AnimatePresence>{modal&&<ChoiceModal close={()=>setModal(false)}/>}</AnimatePresence></>}
-function ChoiceModal({close}:{close:()=>void}){return <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 grid place-items-center bg-[#17212b]/45 p-4"><motion.div initial={{scale:.96,y:10}} animate={{scale:1,y:0}} exit={{scale:.96,y:10}} className="card relative w-full max-w-2xl p-6 sm:p-8"><button onClick={close} className="absolute right-4 top-4 p-2"><X size={19}/></button><p className="eyebrow">Welcome to Skillbridge</p><h2 className="mt-2 text-2xl font-bold">How do you want to use Skillbridge AI?</h2><div className="mt-6 grid gap-4 sm:grid-cols-2"><div className="rounded-2xl border-2 border-brand bg-[#f2faf7] p-5"><BriefcaseBusiness className="text-brand"/><h3 className="mt-4 font-bold">JOB SEEKER</h3><p className="mt-2 text-sm leading-6 muted">Find opportunities, discover your skill gaps, learn what matters, and become job-ready.</p><Link href="/onboarding" className="btn btn-primary mt-5 w-full">Continue as Job Seeker</Link></div><div className="rounded-2xl border border-line p-5"><UserRound className="text-brand"/><h3 className="mt-4 font-bold">RECRUITER</h3><p className="mt-2 text-sm leading-6 muted">Find, evaluate, and hire candidates based on verified capabilities.</p><Link href="/recruiter/coming-soon" className="btn btn-secondary mt-5 w-full">Continue as Recruiter</Link></div></div></motion.div></motion.div>}
+import { ComparisonSection } from "@/components/landing/ComparisonSection";
+import { EvidenceSection } from "@/components/landing/EvidenceSection";
+import { FinalCTA } from "@/components/landing/FinalCTA";
+import { Footer } from "@/components/landing/Footer";
+import { Hero } from "@/components/landing/Hero";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { LandingNavbar } from "@/components/landing/LandingNavbar";
+import { ProductShowcase } from "@/components/landing/ProductShowcase";
+import { RecruiterSection } from "@/components/landing/RecruiterSection";
+import { RoleChoiceModal } from "@/components/landing/RoleChoiceModal";
+import { SeekerSection } from "@/components/landing/SeekerSection";
+import { SplitAudience } from "@/components/landing/SplitAudience";
+import { Testimonials } from "@/components/landing/Testimonials";
+import { TrustSection } from "@/components/landing/TrustSection";
+import { TrustStrip } from "@/components/landing/TrustStrip";
+import { WorkflowSection } from "@/components/landing/WorkflowSection";
+
+export default function Home() {
+  const [choiceOpen, setChoiceOpen] = useState(false);
+  const openChoice = () => setChoiceOpen(true);
+
+  return (
+    <div className="landing-page">
+      <LandingNavbar onGetStarted={openChoice} />
+      <main>
+        <Hero onGetStarted={openChoice} />
+        <TrustStrip />
+        <WorkflowSection />
+        <SeekerSection onGetStarted={openChoice} />
+        <RecruiterSection onGetStarted={openChoice} />
+        <SplitAudience onGetStarted={openChoice} />
+        <ProductShowcase />
+        <EvidenceSection />
+        <ComparisonSection />
+        <HowItWorks />
+        <Testimonials />
+        <TrustSection />
+        <FinalCTA onGetStarted={openChoice} />
+      </main>
+      <Footer />
+      <AnimatePresence>
+        {choiceOpen && <RoleChoiceModal close={() => setChoiceOpen(false)} />}
+      </AnimatePresence>
+    </div>
+  );
+}

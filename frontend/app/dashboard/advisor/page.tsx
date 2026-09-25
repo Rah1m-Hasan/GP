@@ -1,2 +1,27 @@
-"use client"; import { Send, Sparkles } from "lucide-react"; import { useState } from "react";
-export default function Advisor(){const [input,setInput]=useState('');const [messages,setMessages]=useState([{role:'Career Advisor',text:'Hi Alex — I can help you choose what to learn, understand your job matches, or build a practical plan. What are you working toward today?'}]);const ask=(q:string)=>{if(!q)return;setMessages(m=>[...m,{role:'You',text:q},{role:'Career Advisor',text:q.toLowerCase().includes('ready')?'You are ready to apply selectively: your 68% readiness and 87% match at Nova Systems show a solid foundation. Improve Docker next to turn more partial evidence into a stronger match.':'Based on your Backend Developer target and current evidence, Docker is the highest-leverage next skill. Complete the fundamentals module, containerize one small FastAPI project, then take the assessment.'}]);setInput('')};return <><p className="eyebrow">AI career advisor</p><h1 className="mt-2 text-3xl font-bold">Career guidance grounded in your progress.</h1><p className="mt-2 muted">The advisor receives your target, skills, gaps, progress, assessments, job matches, and applications as context.</p><section className="card mt-7 flex min-h-[540px] max-w-4xl flex-col p-5"><div className="flex flex-wrap gap-2 border-b border-line pb-4">{['What should I learn next?','Why is my match 62%?','Am I ready to apply?','Create a 30-day plan'].map(x=><button onClick={()=>ask(x)} key={x} className="rounded-full border border-line px-3 py-1.5 text-xs font-bold hover:border-brand">{x}</button>)}</div><div className="flex-1 space-y-4 py-5">{messages.map((m,i)=><div key={i} className={m.role==='You'?'ml-auto max-w-[80%] rounded-2xl bg-brand p-4 text-sm text-white':'max-w-[85%] rounded-2xl bg-[#f0f6f4] p-4 text-sm leading-6'}><b className="mb-1 block text-xs opacity-70">{m.role}</b>{m.text}</div>)}</div><div className="flex gap-2 border-t border-line pt-4"><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&ask(input)} className="flex-1 rounded-xl border border-line px-3 py-3" placeholder="Ask about your career…"/><button onClick={()=>ask(input)} className="btn btn-primary"><Send size={16}/></button></div></section></>}
+"use client";
+
+import { Send } from "lucide-react";
+import { useState } from "react";
+import { api, ApiError } from "@/lib/api";
+
+type Message = { role: "Career Advisor" | "You"; text: string };
+
+export default function Advisor() {
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([{ role: "Career Advisor", text: "Hi Alex — I can help you choose what to learn or understand your job matches." }]);
+  const ask = async (question: string) => {
+    if (!question.trim() || sending) return;
+    setMessages(items => [...items, { role: "You", text: question }]);
+    setInput("");
+    setSending(true);
+    try {
+      const reply = await api.advisor(question);
+      setMessages(items => [...items, { role: "Career Advisor", text: `${reply.message}${reply.recommendations.length ? `\n\nNext steps: ${reply.recommendations.join(" · ")}` : ""}` }]);
+    } catch (reason) {
+      setMessages(items => [...items, { role: "Career Advisor", text: reason instanceof ApiError ? reason.message : "The advisor is temporarily unavailable." }]);
+    } finally { setSending(false); }
+  };
+
+  return <><p className="eyebrow">AI career advisor</p><h1 className="mt-2 text-3xl font-bold">Career guidance grounded in your progress.</h1><p className="mt-2 muted">Advice can explain and recommend; it cannot verify skills or change your scores.</p><section className="card mt-7 flex min-h-[540px] max-w-4xl flex-col p-5"><div className="flex flex-wrap gap-2 border-b border-line pb-4">{["What should I learn next?", "Am I ready to apply?", "Create a 30-day plan"].map(question => <button onClick={() => ask(question)} key={question} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground hover:border-brand hover:bg-muted">{question}</button>)}</div><div className="flex-1 space-y-4 py-5">{messages.map((message, index) => <div key={index} className={message.role === "You" ? "ml-auto max-w-[80%] whitespace-pre-line rounded-2xl bg-brand p-4 text-sm text-primary-foreground" : "max-w-[85%] whitespace-pre-line rounded-2xl border border-border bg-card p-4 text-sm leading-6 text-card-foreground"}><b className="mb-1 block text-xs opacity-70">{message.role}</b>{message.text}</div>)}{sending && <p className="text-sm muted">Thinking…</p>}</div><div className="flex gap-2 border-t border-line pt-4"><input value={input} onChange={event => setInput(event.target.value)} onKeyDown={event => event.key === "Enter" && ask(input)} className="flex-1 rounded-xl border border-input bg-card px-3 py-3 text-foreground" placeholder="Ask about your career…" /><button disabled={sending} onClick={() => ask(input)} className="btn btn-primary"><Send size={16} /></button></div></section></>;
+}

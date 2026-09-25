@@ -45,6 +45,8 @@ npm run dev -- --port 3000
 
 Open http://localhost:3000.
 
+The frontend defaults to `http://127.0.0.1:8000` for the API. To point it elsewhere, create `frontend/.env.local` with `NEXT_PUBLIC_API_URL=http://host:port`; never put `GROQ_API_KEY` in this file.
+
 ## Demo paths
 
 - Job seeker dashboard: http://localhost:3000/dashboard

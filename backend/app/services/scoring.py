@@ -10,7 +10,11 @@ def calculate_readiness(skills: list[dict], experience_score: float=0.7, project
     requirement_factor = sum(all_levels)/len(all_levels) if all_levels else 0
     return round(100*(.35*verified_factor + .30*requirement_factor + .15*experience_score + .10*project_score + .10*assessment_score))
 def calculate_job_match(user_skills: dict[str, tuple[int,str]], requirements: list[dict], experience_match: float=.8, project_evidence: float=.6, education_match: float=.7) -> MatchResult:
-    required=[r for r in requirements if r.get('required',True)]; preferred=[r for r in requirements if not r.get('required',True)]
+    # Public jobs use `required`; recruiter jobs use `is_required`.  Treat both
+    # consistently so a preferred skill can never be accidentally weighted as a
+    # mandatory requirement.
+    is_required=lambda requirement: requirement.get('is_required',requirement.get('required',True))
+    required=[r for r in requirements if is_required(r)]; preferred=[r for r in requirements if not is_required(r)]
     strong=[];partial=[];missing=[]
     def ratio(items):
         if not items:return 1.0

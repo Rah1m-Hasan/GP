@@ -1,0 +1,4 @@
+"use client";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+export function FinalCTA({ onGetStarted }: { onGetStarted: () => void }) { return <section className="section final-cta-section"><div className="shell"><div className="final-cta"><div className="cta-orb orb-one" /><div className="cta-orb orb-two" /><p className="section-kicker">The next step is clearer here</p><h2>Turn every skill gap into a path forward.</h2><p>Whether you&apos;re building your next career move or your next team, Skillbridge AI keeps evidence, learning, and opportunity connected.</p><div><button onClick={onGetStarted} className="landing-button landing-button-light">Get Started <ArrowRight size={17} /></button><Link href="#job-seekers" className="landing-button landing-button-ghost">Explore Job Seeker Experience</Link></div></div></div></section>; }

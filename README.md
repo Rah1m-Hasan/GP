@@ -57,9 +57,14 @@ python -m app.seed
 
 Readiness and job matching are deterministic backend calculations. AI cannot verify a skill, invent a job, fabricate resume history, apply on a user’s behalf, or change scores. Resume binary data is parsed locally; only sanitized extracted text is eligible for AI analysis.
 
-## Known MVP limitations
+## Current MVP boundaries
 
-Frontend journey persistence currently uses local browser state for interactive demo actions while API contracts are available for migration. Full Alembic migrations, JWT routes, real code-sandbox execution, and live job integrations are planned extension points. Recruiter pages are deliberately limited to a coming-soon experience.
+The job explorer, deterministic match detail, applications, advisor, resume upload, recruiter job creation, candidate pipeline moves, and recruiter notes now call the local FastAPI API. The remaining profile, learning, assessment, interview, comparison, analytics, and settings screens intentionally retain demo presentation data while their API/domain foundations continue to evolve. Full Alembic migrations, production authentication/authorization, real code-sandbox execution, and live job integrations remain planned extension points.
+
+## Brand and landing assets
+
+- The transparent source icon is copied from `logo/logo_without_text.png` to `frontend/public/brand/logo.png`, resized to 512px, and used by navigation, workspace sidebars, and metadata icons. The wordmark remains live website text.
+- Landing photography is served locally from `frontend/public/images/landing/`: `hero-professionals.webp`, `job-seeker-career.webp`, and `recruiter-team.webp`. They were downloaded from the pre-existing Unsplash image references, converted to WebP, and no remote Unsplash image configuration is required at runtime.
 
 ## Recruiter integration points
 

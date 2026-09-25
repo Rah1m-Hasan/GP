@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, Header, HTTPException, status
-from app.schemas.recruiter import AssessmentInput, CompanyUpdate, InterviewInput, OfferInput, PipelineMoveInput, RecruiterAssistantInput, RecruiterJobInput, RecruiterNoteInput
+from app.schemas.recruiter import AssessmentAssignmentInput, AssessmentInput, CandidateComparisonInput, CompanyUpdate, InterviewInput, JobStatusInput, OfferInput, PipelineMoveInput, RecruiterAssistantInput, RecruiterJobInput, RecruiterNoteInput
 from app.services.ai.service import analyze_skills
 from app.services.scoring import calculate_job_match
 
@@ -61,8 +61,8 @@ def update_job(job_id:int,payload:RecruiterJobInput,x_company_id:int|None=Header
 def publish_job(job_id:int,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);job=job_by_id(job_id);job['status']='Active';record('job','published',f"Sarah published {job['title']}");return job
 @router.post('/jobs/{job_id}/status')
-def set_job_status(job_id:int,payload:dict,x_company_id:int|None=Header(default=None)):
-    require_company(x_company_id);job=job_by_id(job_id);job['status']=payload.get('status','Paused');record('job','status_changed',f"{job['title']} is now {job['status']}");return job
+def set_job_status(job_id:int,payload:JobStatusInput,x_company_id:int|None=Header(default=None)):
+    require_company(x_company_id);job=job_by_id(job_id);job['status']=payload.status;record('job','status_changed',f"{job['title']} is now {job['status']}");return job
 @router.get('/jobs/{job_id}/pipeline')
 def pipeline(job_id:int,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);job_by_id(job_id); return {'stages':STAGES,'candidates':[candidate for candidate in candidates if candidate['job_id']==job_id]}
@@ -77,7 +77,7 @@ def move_stage(candidate_id:int,payload:PipelineMoveInput,x_company_id:int|None=
     require_company(x_company_id);candidate=candidate_by_id(candidate_id);previous=candidate['stage'];candidate['stage']=payload.stage;record('candidate','stage_moved',f"Sarah moved {candidate['name']} from {previous} to {payload.stage}");return candidate
 @router.post('/candidates/{candidate_id}/notes',status_code=201)
 def add_note(candidate_id:int,payload:RecruiterNoteInput,x_company_id:int|None=Header(default=None)):
-    require_company(x_company_id);candidate=candidate_by_id(candidate_id);note={'id':len(candidate['notes'])+1,'author':'Sarah Johnson','created':datetime.now().strftime('%Y-%m-%d %H:%M'),'body':payload.body};candidate['notes'].append(note);record('candidate','note_added',f"Sarah added a note for {candidate['name']}");return note
+    require_company(x_company_id);candidate=candidate_by_id(candidate_id);note={'id':max((item['id'] for item in candidate['notes']),default=0)+1,'author':'Sarah Johnson','created':datetime.now().strftime('%Y-%m-%d %H:%M'),'body':payload.body};candidate['notes'].append(note);record('candidate','note_added',f"Sarah added a note for {candidate['name']}");return note
 @router.delete('/candidates/{candidate_id}/notes/{note_id}',status_code=204)
 def delete_note(candidate_id:int,note_id:int,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);candidate=candidate_by_id(candidate_id);candidate['notes'][:]=[n for n in candidate['notes'] if n['id']!=note_id]
@@ -95,10 +95,13 @@ def get_assessment(assessment_id:int,x_company_id:int|None=Header(default=None))
     if not assessment: raise HTTPException(404,'Assessment not found')
     return assessment
 @router.post('/assessments/{assessment_id}/assign')
-def assign_assessment(assessment_id:int,payload:dict,x_company_id:int|None=Header(default=None)):
+def assign_assessment(assessment_id:int,payload:AssessmentAssignmentInput,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);assessment=next((a for a in assessments if a['id']==assessment_id),None)
     if not assessment: raise HTTPException(404,'Assessment not found')
-    candidate=candidate_by_id(int(payload.get('candidate_id',0)));candidate['stage']='Assessment';assessment['assigned']+=1;record('assessment','assigned',f"Sarah assigned {assessment['title']} to {candidate['name']}");return {'assessment':assessment,'candidate':candidate}
+    candidate=candidate_by_id(payload.candidate_id)
+    if candidate['job_id'] != assessment['job_id']:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY,'Assessment and candidate must belong to the same job.')
+    candidate['stage']='Assessment';assessment['assigned']+=1;record('assessment','assigned',f"Sarah assigned {assessment['title']} to {candidate['name']}");return {'assessment':assessment,'candidate':candidate}
 @router.get('/assessment-results/{candidate_id}')
 def assessment_result(candidate_id:int,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);candidate=candidate_by_id(candidate_id);return {'candidate_id':candidate_id,'overall':candidate['assessment'] or 0,'technical_knowledge':88,'problem_solving':91,'code_quality':79,'system_design':72,'communication':84,'ai_feedback_label':'AI-assisted feedback — recruiter review required'}
@@ -107,7 +110,10 @@ def list_interviews(status_filter:str='',x_company_id:int|None=Header(default=No
     require_company(x_company_id);return [i for i in interviews if not status_filter or i['status'].lower()==status_filter.lower()]
 @router.post('/interviews',status_code=201)
 def schedule_interview(payload:InterviewInput,x_company_id:int|None=Header(default=None)):
-    require_company(x_company_id);candidate=candidate_by_id(payload.candidate_id);job_by_id(payload.job_id); interview={'id':max(i['id'] for i in interviews)+1,'candidate_id':payload.candidate_id,'job_id':payload.job_id,'type':payload.interview_type,'scheduled_for':payload.scheduled_for.isoformat(),'duration_minutes':payload.duration_minutes,'interviewer':payload.interviewer,'status':'Upcoming'};interviews.append(interview);candidate['stage']='Interview';record('interview','scheduled',f"Sarah scheduled {payload.interview_type} with {candidate['name']}");return interview
+    require_company(x_company_id);candidate=candidate_by_id(payload.candidate_id);job_by_id(payload.job_id)
+    if candidate['job_id'] != payload.job_id:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY,'Interview and candidate must belong to the same job.')
+    interview={'id':max(i['id'] for i in interviews)+1,'candidate_id':payload.candidate_id,'job_id':payload.job_id,'type':payload.interview_type,'scheduled_for':payload.scheduled_for.isoformat(),'duration_minutes':payload.duration_minutes,'interviewer':payload.interviewer,'status':'Upcoming'};interviews.append(interview);candidate['stage']='Interview';record('interview','scheduled',f"Sarah scheduled {payload.interview_type} with {candidate['name']}");return interview
 @router.get('/interviews/{interview_id}')
 def get_interview(interview_id:int,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);interview=next((i for i in interviews if i['id']==interview_id),None)
@@ -117,10 +123,9 @@ def get_interview(interview_id:int,x_company_id:int|None=Header(default=None)):
 def create_offer(candidate_id:int,payload:OfferInput,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);candidate=candidate_by_id(candidate_id);candidate['stage']='Offer';record('offer','drafted',f"Sarah drafted an offer for {candidate['name']}");return {'candidate_id':candidate_id,**payload.model_dump(),'status':'Draft','final_decision_required':True}
 @router.post('/comparisons')
-def compare_candidates(payload:dict,x_company_id:int|None=Header(default=None)):
-    require_company(x_company_id);ids=payload.get('candidate_ids',[])
-    if not 2<=len(ids)<=5: raise HTTPException(422,'Select between 2 and 5 candidates')
-    return {'candidates':[candidate_by_id(int(i)) for i in ids],'notice':'Evidence comparison only. Skillbridge does not select a winner or recommend a final hiring decision.'}
+def compare_candidates(payload:CandidateComparisonInput,x_company_id:int|None=Header(default=None)):
+    require_company(x_company_id)
+    return {'candidates':[candidate_by_id(candidate_id) for candidate_id in payload.candidate_ids],'notice':'Evidence comparison only. Skillbridge does not select a winner or recommend a final hiring decision.'}
 @router.get('/analytics')
 def analytics(x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);return {'funnel':{'Applications':342,'Qualified':128,'Assessment':74,'Interview':21,'Offers':6,'Hires':4},'jobs':[{'title':j['title'],'applications':j['applications']} for j in jobs],'scores':[72,76,79,82,84,87,91],'time_in_stage':[{'stage':'Recruiter Review','days':3.1},{'stage':'Assessment','days':4.5},{'stage':'Interview','days':5.2}]}

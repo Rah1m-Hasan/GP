@@ -11,7 +11,7 @@ def test_recruiter_dashboard_and_company_isolation():
     assert error.value.status_code==403
 
 def test_job_and_pipeline_move():
-    job=create_job(RecruiterJobInput(title='QA Engineer',requirements=[]),x_company_id=None)
+    job=create_job(RecruiterJobInput(title='QA Engineer',requirements=[{'name':'Python','required_level':60}]),x_company_id=None)
     assert job['status']=='Draft'
     moved=move_stage(1,PipelineMoveInput(stage='Interview'),x_company_id=None)
     assert moved['stage']=='Interview'
