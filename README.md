@@ -2,6 +2,8 @@
 
 The AI-Powered Bridge Between Education and Employment. This monorepo provides a polished, job-seeker-first MVP: assess skills, identify evidence gaps, learn from validated resources, prove capability, target suitable jobs, apply, and practice interviews.
 
+For exact local startup instructions, use [RUN_LOCAL.md](RUN_LOCAL.md).
+
 ## Stack
 
 - `frontend/`: Next.js 14, React, TypeScript strict mode, Tailwind, Framer Motion, Lucide.
