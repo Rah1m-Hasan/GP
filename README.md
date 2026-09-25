@@ -36,6 +36,20 @@ Use `alex@skillbridge.demo` with any demo password on the sign-in screen. The co
 - `POST /api/resume/upload`
 - `POST /api/advisor/chat`
 - `GET/POST /api/applications`, `PUT /api/applications/{id}`
+- Recruiter: `/api/recruiter/dashboard`, `/company`, `/jobs`, `/candidates`, `/assessments`, `/interviews`, `/comparisons`, `/analytics`, `/notifications`, `/activity`, and `/assistant/chat`.
+
+## Recruiter workspace
+
+The recruiter experience lives under `/recruiter`. Use the demo recruiter identity **Sarah Johnson** (`sarah@novasystems.demo`), Senior Technical Recruiter at Nova Systems. It provides onboarding, company configuration, jobs, editable skill requirements, pipeline controls, candidate evidence profiles, recruiter notes, assessment drafts, interview reports, comparisons, analytics, and offer drafts.
+
+Recruiter AI is strictly decision support: it summarizes job-relevant evidence and suggests review questions. It cannot select, reject, rank for final hire, move a candidate, or send an offer without explicit recruiter action.
+
+Run the local idempotent demo seed after installing backend requirements:
+
+```bash
+cd backend
+python -m app.seed
+```
 
 ## Important safeguards
 

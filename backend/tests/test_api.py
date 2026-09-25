@@ -1,6 +1,11 @@
-from fastapi.testclient import TestClient
-from app.main import app
+from app.main import health
+from app.routers import dashboard, jobs
+
 def test_health():
-    with TestClient(app) as client: assert client.get('/health').status_code==200
+    assert health()['status']=='ok'
+
 def test_jobs():
-    with TestClient(app) as client: assert len(client.get('/api/jobs').json())>=2
+    assert len(jobs.list_jobs())>=2
+
+def test_dashboard_payload():
+    assert dashboard.dashboard()['readiness']>=0
