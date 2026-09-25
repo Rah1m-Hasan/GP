@@ -27,4 +27,4 @@ Repository initialized and first milestone committed: `b0a03cb feat: scaffold Sk
 ## Verification (2026-09-25)
 
 - `frontend`: `npx tsc --noEmit` and `npm run build` both pass; 18 routes compile successfully.
-- `backend`: Python syntax compilation passes (`python3 -m compileall -q app`). Dependency retrieval was started but did not complete in this environment, so `pytest` and a live FastAPI startup check remain outstanding.
+- `backend`: Python syntax compilation passes (`python3 -m compileall -q app`). Dependencies are installed. Pytest needed an explicit project import path under pytest 9; `backend/pytest.ini` now supplies it. Re-run tests and live startup after this correction.
