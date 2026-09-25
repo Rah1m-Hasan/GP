@@ -22,4 +22,9 @@ Initial functional job-seeker MVP scaffold is in place: premium Next.js UI, Fast
 
 ## Git status
 
-The workspace shipped with an empty, read-only `.git` directory, so Git repository initialization and first commit still require filesystem approval. No remote origin was supplied, so a GitHub push cannot happen until one is configured.
+Repository initialized and first milestone committed: `b0a03cb feat: scaffold Skillbridge AI job seeker MVP`. No remote origin was supplied, so a GitHub push cannot happen until one is configured.
+
+## Verification (2026-09-25)
+
+- `frontend`: `npx tsc --noEmit` and `npm run build` both pass; 18 routes compile successfully.
+- `backend`: Python syntax compilation passes (`python3 -m compileall -q app`). Dependency retrieval was started but did not complete in this environment, so `pytest` and a live FastAPI startup check remain outstanding.
