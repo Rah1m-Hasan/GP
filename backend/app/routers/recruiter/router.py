@@ -71,7 +71,7 @@ def list_candidates(q:str='',job_id:int|None=None,stage:str='',x_company_id:int|
     require_company(x_company_id);return [c for c in candidates if (not q or q.lower() in (c['name']+c['role']+' '.join(s['name'] for s in c['skills'])).lower()) and (job_id is None or c['job_id']==job_id) and (not stage or c['stage']==stage)]
 @router.get('/candidates/{candidate_id}')
 def get_candidate(candidate_id:int,x_company_id:int|None=Header(default=None)):
-    require_company(x_company_id);candidate=candidate_by_id(candidate_id);job=job_by_id(candidate['job_id']); user_skills={s['name']:(s['score'],s['source']) for s in candidate['skills']}; match=calculate_job_match(user_skills,job['requirements'],.8,.7,.7);return {**candidate,'job':job,'match_explanation':match.__dict__,'privacy':'Candidate data shown is limited to the role application and shared evidence.'}
+    require_company(x_company_id);candidate=candidate_by_id(candidate_id);job=job_by_id(candidate['job_id']); user_skills={s['name']:(s['score'],s['source']) for s in candidate['skills']}; match=calculate_job_match(user_skills,job['requirements'],.9,.95,1);return {**candidate,'job':job,'match_explanation':match.__dict__,'privacy':'Candidate data shown is limited to the role application and shared evidence.'}
 @router.post('/candidates/{candidate_id}/stage')
 def move_stage(candidate_id:int,payload:PipelineMoveInput,x_company_id:int|None=Header(default=None)):
     require_company(x_company_id);candidate=candidate_by_id(candidate_id);previous=candidate['stage'];candidate['stage']=payload.stage;record('candidate','stage_moved',f"Sarah moved {candidate['name']} from {previous} to {payload.stage}");return candidate
